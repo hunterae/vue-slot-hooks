@@ -4,6 +4,7 @@
 // TODO: ability to "skip"
 // TODO: ability to specify content for block ("SLOT_PREFIXcontentSLOT_SUFFIX")
 // TODO: prop to inherit-parent-default-slot
+// TODO: add a force-root-component option, to allow a component to be rendered "around" everything if the coresponding result would break single child rules
 
 import {
   mapSlotsToChildren,
