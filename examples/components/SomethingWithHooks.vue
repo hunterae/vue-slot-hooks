@@ -2,8 +2,7 @@
   <div>
     <RenderTagWithContent
       is="render-with-slot-hooks"
-      tag="h1"
-      style="color:red"
+      tag="span"
       slot-suffix="_example_1"
       inherit-parent-slots
     >Test</RenderTagWithContent>

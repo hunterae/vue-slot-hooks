@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <SomethingWithHooks>
-      <i slot="prepend_example_1">Prepended DOM Node</i>
+      <RenderTagWithContent style="color:orange" slot="around_example_1" tag="h1" />
+      <!-- <i slot="prepend_example_1">Prepended DOM Node</i>
       <i slot="append_example_1">Appended DOM Node</i>
-      Content
+      Content -->
       <!-- <RenderTagWithContent
         tag="i"
         slot="prepend_example_1"

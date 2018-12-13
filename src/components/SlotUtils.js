@@ -51,15 +51,25 @@ export function scopedSlotFor(slotName, scopedSlots, namespace) {
   return scopedSlots[namespacedSlotName(slotName, namespace)]
 }
 
-export function applyAroundSlots(slotName, scopedSlots, content, namespace) {
-  let hook = scopedSlotFor(slotName, scopedSlots, namespace)
-  if (hook) {
+export function applyAroundSlots(
+  slotName,
+  slots,
+  scopedSlots,
+  content,
+  namespace,
+  createElement
+) {
+  let scopedHook = scopedSlotFor(slotName, scopedSlots, namespace)
+  let slotHook = slotFor(slotName, slots, namespace)[0]
+  if (scopedHook) {
     return [
-      hook({
+      scopedHook({
         functional: true,
         render: () => content
       })
     ]
+  } else if (slotHook) {
+    return createElement(slotHook.tag, slotHook.data, [content])
   } else {
     return content
   }

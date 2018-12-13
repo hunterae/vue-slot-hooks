@@ -119,9 +119,11 @@ export default {
         } else {
           return applyAroundSlots(
             hook,
+            slots,
             scopedSlots,
             applySlotHooks(innerHooks),
-            context.props
+            context.props,
+            createElement
           )
         }
       } else if (hooks === 'CONTENT') {
