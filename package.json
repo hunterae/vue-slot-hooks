@@ -1,6 +1,6 @@
 {
   "name": "vue-slot-hooks",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/vue-slot-hooks.common.js",
   "scripts": {
     "serve": "vue-cli-service serve --open",
@@ -21,8 +21,8 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0-0",
-    "vue-template-compiler": "^2.5.17",
-    "vue": "^2.5.17"
+    "vue": "^2.5.17",
+    "vue-template-compiler": "^2.5.17"
   },
   "peerDependencies": {
     "vue": ">=2.1.0"
