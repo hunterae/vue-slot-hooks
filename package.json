@@ -1,6 +1,6 @@
 {
   "name": "vue-slot-hooks",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/vue-slot-hooks.common.js",
   "scripts": {
     "serve": "vue-cli-service serve --open",

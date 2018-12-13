@@ -27,6 +27,6 @@ export default {
     if (!outerHooksRenderer)
       Vue.component('RenderWithOuterSlotHooks', RenderWithOuterSlotHooks)
     if (!innerHooksRenderer)
-      Vue.component('RenderWithInnerSlotHooks', RenderWithOuterSlotHooks)
+      Vue.component('RenderWithInnerSlotHooks', RenderWithInnerSlotHooks)
   }
 }
