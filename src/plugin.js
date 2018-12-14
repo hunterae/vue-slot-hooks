@@ -2,7 +2,7 @@ import RenderWithSlotHooks from './components/RenderWithSlotHooks'
 import RenderWithOuterSlotHooks from './components/RenderWithOuterSlotHooks'
 import RenderWithInnerSlotHooks from './components/RenderWithInnerSlotHooks'
 
-export default {
+const VueSlotHooksPlugin = {
   install(Vue, options = {}) {
     let alias = options.alias
     let mainRenderer, outerHooksRenderer, innerHooksRenderer
@@ -29,4 +29,17 @@ export default {
     if (!innerHooksRenderer)
       Vue.component('RenderWithInnerSlotHooks', RenderWithInnerSlotHooks)
   }
+}
+
+export default VueSlotHooksPlugin
+
+export {
+  RenderWithSlotHooks,
+  RenderWithInnerSlotHooks,
+  RenderWithOuterSlotHooks
+}
+
+// Automatic installation if Vue has been added to the global scope.
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(VueSlotHooksPlugin)
 }
