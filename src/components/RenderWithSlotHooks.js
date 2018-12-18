@@ -5,8 +5,6 @@
 // TODO: ability to specify content for block ("SLOT_PREFIXcontentSLOT_SUFFIX")
 // TODO: prop to inherit-parent-default-slot
 // TODO: add a force-root-component option, to allow a component to be rendered "around" everything if the coresponding result would break single child rules
-// TODO: ensure javascript is minimizing and the right version is being used by default
-// TODO: look into rollup
 // TODO: better exporting of singular components
 
 import {
@@ -15,10 +13,11 @@ import {
   namespacedSlotName,
   applyAroundSlots,
   slotFor
-} from './SlotUtils'
-import omit from 'lodash/omit'
-import isPlainObject from 'lodash/isPlainObject'
-import compact from 'lodash/compact'
+} from '../utils/SlotUtils'
+// import omit from 'lodash/omit'
+// import isObjectLike from 'lodash/isObjectLike'
+// import compact from 'lodash/compact'
+import { omit, isObjectLike, compact } from '../utils/HelperUtils'
 
 export default {
   props: {
@@ -63,7 +62,7 @@ export default {
     let scopedSlots = context.data.scopedSlots || {}
 
     if (context.props.inheritParentSlots) {
-      ({ slots, scopedSlots } = mergeSlotsFromParent(
+      ;({ slots, scopedSlots } = mergeSlotsFromParent(
         slots,
         scopedSlots,
         context.parent.$slots,
@@ -81,7 +80,7 @@ export default {
           slotNamesUsed = slotNamesUsed.concat(detectSlotNamesUsed(hook))
         })
         return compact(slotNamesUsed)
-      } else if (isPlainObject(slotHookStructure)) {
+      } else if (isObjectLike(slotHookStructure)) {
         let [hook, innerHooks] = Object.entries(slotHookStructure)[0]
         if (hook === 'CONTENT') {
           return detectSlotNamesUsed(innerHooks)
@@ -112,7 +111,7 @@ export default {
     let applySlotHooks = hooks => {
       if (Array.isArray(hooks)) {
         return hooks.map(hook => applySlotHooks(hook))
-      } else if (isPlainObject(hooks)) {
+      } else if (isObjectLike(hooks)) {
         let [hook, innerHooks] = Object.entries(hooks)[0]
         if (hook === 'CONTENT') {
           return createContent(

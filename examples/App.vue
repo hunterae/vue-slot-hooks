@@ -1,11 +1,10 @@
 <template>
   <div id="app">
     <SomethingWithHooks>
-      <RenderTagWithContent style="color:orange" slot="around_example_1" tag="h1" />
-      <!-- <i slot="prepend_example_1">Prepended DOM Node</i>
+      <i slot="prepend_example_1">Prepended DOM Node</i>
       <i slot="append_example_1">Appended DOM Node</i>
-      Content -->
-      <!-- <RenderTagWithContent
+      Content
+      <RenderTagWithContent
         tag="i"
         slot="prepend_example_1"
         style="color: orange"
@@ -32,37 +31,29 @@
       >"After All" Content</RenderTagWithContent>
 
       <div
-        style="background-color: green"
-        slot-scope="{children, renderer}"
+        style="background-color: green; padding: 10px"
         slot="surround_example_1"
       >
-        <component :is="renderer" :children="children"></component>
       </div>
 
       <RenderTagWithContent
-        style="background-color: yellow"
-        slot-scope="{children, renderer}"
+        style="background-color: yellow; padding: 10px"
         slot="around_example_1"
       >
-        <component :is="renderer" :children="children"></component>
       </RenderTagWithContent>
 
       <div
-        style="background-color: purple"
-        slot-scope="{children, renderer}"
+        style="background-color: purple; padding: 10px"
         slot="around_all_example_1"
       >
-        <component :is="renderer" :children="children"></component>
-      </div> -->
-
-      <b>Content</b>
+      </div>
     </SomethingWithHooks>
   </div>
 </template>
 
 <script>
-import RenderTagWithContent from '../examples/components/RenderTagWithContent'
-import SomethingWithHooks from '../examples/components/SomethingWithHooks'
+import RenderTagWithContent from './components/RenderTagWithContent'
+import SomethingWithHooks from './components/SomethingWithHooks'
 
 export default {
   name: 'app',

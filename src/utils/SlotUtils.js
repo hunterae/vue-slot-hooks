@@ -1,5 +1,6 @@
-import flatten from 'lodash/flatten'
-import omit from 'lodash/omit'
+import { omit, flatten } from './HelperUtils'
+// import omit from 'lodash/omit'
+// import flatten from 'lodash/flatten'
 
 export function mapSlotsToChildren(createElement, slots) {
   return flatten(Object.values(slots)).map(slot => {
@@ -62,14 +63,9 @@ export function applyAroundSlots(
   let scopedHook = scopedSlotFor(slotName, scopedSlots, namespace)
   let slotHook = slotFor(slotName, slots, namespace)[0]
   if (scopedHook) {
-    return [
-      scopedHook({
-        functional: true,
-        render: () => content
-      })
-    ]
+    return [scopedHook({ functional: true, render: () => content })]
   } else if (slotHook) {
-    return createElement(slotHook.tag, slotHook.data, [content])
+    return [createElement(slotHook.tag, slotHook.data, [content])]
   } else {
     return content
   }
