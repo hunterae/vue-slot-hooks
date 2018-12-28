@@ -1,144 +1,81 @@
-// TODO: automatically convert named around slots with no definition to scoped slots?
-// TODO: if going with above idea, this would allow multiple such slots to be defined - dsl might need to be adjusted to limit to single or multi
-// TODO: build slotHookStructure with some sort of a dsl
-// TODO: ability to "skip"
-// TODO: ability to specify content for block ("SLOT_PREFIXcontentSLOT_SUFFIX")
-// TODO: prop to inherit-parent-default-slot
-// TODO: add a force-root-component option, to allow a component to be rendered "around" everything if the coresponding result would break single child rules
-// TODO: better exporting of singular components
+// TODO: ability to provide an alias to fields as a kind of backup for where to find definitions
+// TODO: ability to specity a proxy slot - aka a different slot to render with
+// TODO: See if importing Lodash methods via approach in this article https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark is sufficient over the custom implemntations of these methods
 
-import {
-  mapSlotsToChildren,
-  mergeSlotsFromParent,
-  namespacedSlotName,
-  applyAroundSlots,
-  slotFor
-} from '../utils/SlotUtils'
-// import omit from 'lodash/omit'
-// import isObjectLike from 'lodash/isObjectLike'
-// import compact from 'lodash/compact'
-import { omit, isObjectLike, compact } from '../utils/HelperUtils'
+import { pick, omit } from '../utils/HelperUtils'
+import RenderSlotHooks from './RenderSlotHooks'
+import { InheritSlots } from 'vue-inherit-slots'
 
 export default {
   props: {
-    tag: {
-      default: null
-    },
-    slotPrefix: {
-      default: ''
-    },
-    slotSuffix: {
-      default: ''
-    },
-    inheritParentSlots: {
+    ...omit(RenderSlotHooks.props, ['tag', 'slotHookNameResolver']),
+    ...InheritSlots.props,
+    inheritSlots: {
       type: Boolean,
       default: false
     },
-    slotHookStructure: {
+    tag: {
+      default: null
+    },
+    slotHookRenderer: {
+      type: Object,
       default() {
-        return [
-          'before_all',
-          {
-            around_all: [
-              'before',
-              {
-                around: {
-                  CONTENT: {
-                    surround: ['prepend', 'default', 'append']
-                  }
-                }
-              },
-              'after'
-            ]
-          },
-          'after_all'
-        ]
+        return RenderSlotHooks
+      }
+    },
+    slotHookNameResolver: {
+      type: Function,
+      default(slotName, hookName) {
+        if (hookName === 'default') {
+          return slotName ? ['default', slotName] : 'default'
+        } else {
+          return slotName ? `${hookName}_${slotName}` : hookName
+        }
       }
     }
+    // TODO: implement this
+    // replaceable: {
+    //   type: Boolean,
+    //   default: true
+    // },
+    // TODO: implement this - whether or not replacing the element definition completely replaces it or just replaces it's children
+    // preserveTag: {
+    //   type: Boolean,
+    //   default: true
+    // }
+    // TODO: implement this
+    // skippable: {
+    //   type: Boolean,
+    //   default: true
+    // }
   },
   functional: true,
   render(createElement, context) {
-    let slots = context.slots()
+    let { inheritSlots, slotHookRenderer, tag } = context.props
     let scopedSlots = context.data.scopedSlots || {}
+    tag = tag || context.data.tag || 'div'
 
-    if (context.props.inheritParentSlots) {
-      ;({ slots, scopedSlots } = mergeSlotsFromParent(
-        slots,
-        scopedSlots,
-        context.parent.$slots,
-        context.parent.$scopedSlots
-        // TODO: pass another option specifying whether to include the parents default slot
-      ))
-    }
-
-    let tag = context.props.tag || context.data.tag || 'div'
-
-    const detectSlotNamesUsed = slotHookStructure => {
-      if (Array.isArray(slotHookStructure)) {
-        let slotNamesUsed = []
-        slotHookStructure.forEach(hook => {
-          slotNamesUsed = slotNamesUsed.concat(detectSlotNamesUsed(hook))
+    let inheritedSlots = []
+    if (inheritSlots) {
+      inheritedSlots = [
+        createElement(InheritSlots, {
+          scopedSlots: omit(scopedSlots, ['default']),
+          props: pick(context.props, Object.keys(InheritSlots.props))
         })
-        return compact(slotNamesUsed)
-      } else if (isObjectLike(slotHookStructure)) {
-        let [hook, innerHooks] = Object.entries(slotHookStructure)[0]
-        if (hook === 'CONTENT') {
-          return detectSlotNamesUsed(innerHooks)
-        } else {
-          return [
-            namespacedSlotName(hook, context.props),
-            ...detectSlotNamesUsed(innerHooks)
-          ]
-        }
-      } else if (slotHookStructure === 'CONTENT') {
-        return []
-      } else if (typeof slotHookStructure === 'string') {
-        return [namespacedSlotName(slotHookStructure, context.props)]
-      }
+      ]
     }
 
-    let slotNamesUsed = detectSlotNamesUsed(context.props.slotHookStructure)
-    let unusedSlots = mapSlotsToChildren(
-      createElement,
-      omit(slots, slotNamesUsed)
+    return createElement(
+      slotHookRenderer,
+      {
+        ...context.data,
+        scopedSlots,
+        props: {
+          ...pick(context.props, Object.keys(RenderSlotHooks.props)),
+          tag
+        }
+      },
+      [...inheritedSlots, context.children]
     )
-    let unusedScopedSlots = omit(scopedSlots, slotNamesUsed)
-
-    let createContent = (contextData, unusedSlots) => {
-      return createElement(tag, contextData, unusedSlots)
-    }
-
-    let applySlotHooks = hooks => {
-      if (Array.isArray(hooks)) {
-        return hooks.map(hook => applySlotHooks(hook))
-      } else if (isObjectLike(hooks)) {
-        let [hook, innerHooks] = Object.entries(hooks)[0]
-        if (hook === 'CONTENT') {
-          return createContent(
-            { ...context.data, scopedSlots: unusedScopedSlots },
-            applySlotHooks(innerHooks)
-          )
-        } else {
-          return applyAroundSlots(
-            hook,
-            slots,
-            scopedSlots,
-            applySlotHooks(innerHooks),
-            context.props,
-            createElement
-          )
-        }
-      } else if (hooks === 'CONTENT') {
-        return createContent(
-          { ...context.data, scopedSlots: unusedScopedSlots },
-          unusedSlots
-        )
-      } else if (typeof hooks === 'string') {
-        return slotFor(hooks, slots, context.props)
-      }
-    }
-
-    let content = applySlotHooks(context.props.slotHookStructure)
-    return content
   }
 }

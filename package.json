@@ -1,6 +1,6 @@
 {
   "name": "vue-slot-hooks",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "main": "dist/vue-slot-hooks.umd.js",
   "module": "dist/vue-slot-hooks.esm.js",
   "unpkg": "dist/vue-slot-hooks.min.js",
@@ -12,7 +12,7 @@
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es --file dist/vue-slot-hooks.esm.js",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife --file dist/vue-slot-hooks.min.js",
     "lint": "vue-cli-service lint --fix",
-    "docs": "vue-cli-service build --dest docs",
+    "docs": "vue-cli-service build --target lib --name vue-slot-hooks ./examples/main.js",
     "gh": "gh-pages -d docs",
     "publish-docs": "./build/publish_docs.sh"
   },
@@ -51,5 +51,8 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "dependencies": {
+    "vue-inherit-slots": "^0.1.0"
+  }
 }

@@ -1,65 +1,41 @@
 <template>
   <div id="app">
-    <SomethingWithHooks>
-      <i slot="prepend_example_1">Prepended DOM Node</i>
-      <i slot="append_example_1">Appended DOM Node</i>
-      Content
-      <RenderTagWithContent
-        tag="i"
-        slot="prepend_example_1"
-        style="color: orange"
-      >Prepended Component</RenderTagWithContent>
-      <i slot="append_example_1">Appended DOM Node</i>
-      <RenderTagWithContent tag="i" slot="append_example_1" style="color: orange">Appended Content</RenderTagWithContent>
-
-      <h3 slot="before_example_1">"Before" DOM Node</h3>
-      <RenderTagWithContent tag="h3" slot="before_example_1" style="color: orange">"Before" Content</RenderTagWithContent>
-      <h3 slot="after_example_1">"After" DOM Node</h3>
-      <RenderTagWithContent tag="h3" slot="after_example_1" style="color: orange">"After" Content</RenderTagWithContent>
-
-      <h2 slot="before_all_example_1">"Before All" DOM Node</h2>
-      <RenderTagWithContent
-        tag="h2"
-        slot="before_all_example_1"
-        style="color: orange"
-      >"Before All" Content</RenderTagWithContent>
-      <h2 slot="after_all_example_1">"After All" DOM Node</h2>
-      <RenderTagWithContent
-        tag="h2"
-        slot="after_all_example_1"
-        style="color: orange"
-      >"After All" Content</RenderTagWithContent>
-
-      <div
-        style="background-color: green; padding: 10px"
-        slot="surround_example_1"
-      >
+    <some-component>
+      <i slot="prepend_navbar">Prepended</i>
+      <i slot="append_navbar">Appended</i>
+      <div slot="surround_navbar" style="color: orange"></div>
+      <h2 slot="before_navbar">Before component</h2>
+      <h2 slot="after_navbar">After component</h2>
+      <div slot="around_navbar" style="background-color: green"></div>
+      <!-- <div slot="around_navbar" slot-scope="scope">
+        around
+        <component :is="scope"></component>
+        around
+      </div> -->
+      <div slot="navbar">NAVBAR</div>
+      <h3 slot="before_all_navbar">Before all component</h3>
+      <h3 slot="after_all_navbar">After all component</h3>
+      <div slot="around_all_navbar" style="background-color: yellow"></div>
+      <div slot="around_all_navbar" style="color: purple"></div>
+      <h4 slot="prepend_content">Prepended to content</h4>
+      <h4 slot="append_content">Appended to content</h4>
+      <h5 slot="some_other_slot">Some other slot from app</h5>
+      <div slot="abcd" slot-scope="something">
+        <h1>t</h1>
       </div>
-
-      <RenderTagWithContent
-        style="background-color: yellow; padding: 10px"
-        slot="around_example_1"
-      >
-      </RenderTagWithContent>
-
-      <div
-        style="background-color: purple; padding: 10px"
-        slot="around_all_example_1"
-      >
-      </div>
-    </SomethingWithHooks>
+    </some-component>
   </div>
 </template>
 
 <script>
 import RenderTagWithContent from './components/RenderTagWithContent'
-import SomethingWithHooks from './components/SomethingWithHooks'
+import SomeComponent from './components/SomeComponent'
 
 export default {
   name: 'app',
   components: {
-    SomethingWithHooks,
-    RenderTagWithContent
+    RenderTagWithContent,
+    SomeComponent
   }
 }
 </script>

@@ -87,3 +87,5 @@ export function isObjectLike(value) {
 export function compact(array) {
   return array.filter(x => !!x)
 }
+
+export default {}
