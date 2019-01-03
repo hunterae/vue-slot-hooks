@@ -29,11 +29,6 @@
       hi
     </functional-render-tag-with-content> -->
 
-    <!-- <some-slot-rendering-component>
-      <inherit-slots />
-      <h5 slot="some_other_slot">Some other slot from SomeComponent</h5>
-    </some-slot-rendering-component> -->
-
     <!-- <div>
       <div slot="some_other_slot">Some other slot from SomeComponent</div>
       <div slot="prepend_navbar">Prepended in component</div>
@@ -52,13 +47,11 @@
 <script>
 import RenderTagWithContent from './RenderTagWithContent'
 import FunctionalRenderTagWithContent from './FunctionalRenderTagWithContent'
-import SomeSlotRenderingComponent from './SomeSlotRenderingComponent'
 
 export default {
   components: {
     RenderTagWithContent,
-    FunctionalRenderTagWithContent,
-    SomeSlotRenderingComponent
+    FunctionalRenderTagWithContent
   }
 }
 </script>

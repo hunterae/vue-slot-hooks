@@ -1,10 +1,11 @@
-import { omit, compact } from '../utils/HelperUtils'
+import { omit, compact, flatten } from '../utils/HelperUtils'
 import { renderableSlotScope } from '../utils/RenderUtils'
 
 export default {
   props: {
     name: {
-      required: true
+      required: true,
+      type: String
     },
     slots: {
       type: Object,
@@ -21,32 +22,56 @@ export default {
     firstSlotOnly: {
       type: Boolean,
       default: false
+    },
+    fallbackTag: {},
+    fallbackTagData: {
+      type: Object
+    },
+    slotReplacesChildren: {
+      type: Boolean,
+      default: false
+    },
+    slotScopeData: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
   },
   functional: true,
   render(h, context) {
-    // TODO: implement scopedSlots handling
-    // eslint-disable-next-line no-unused-vars
-    let { name, slots, scopedSlots, skip, firstSlotOnly } = context.props
+    let {
+      name,
+      slots,
+      scopedSlots,
+      skip,
+      firstSlotOnly,
+      fallbackTag,
+      fallbackTagData,
+      slotReplacesChildren,
+      slotScopeData
+    } = context.props
     let slot, scopedSlot
 
-    if (Array.isArray(name)) {
-      name = name.find(slotName => typeof slots[slotName] !== 'undefined')
-      if (name) {
-        slot = slots[name]
-        scopedSlot = scopedSlots[name[name.length - 1]]
-      }
-    } else {
-      slot = slots[name]
-      scopedSlot = scopedSlots[name]
-    }
+    slot = slots[name]
+    scopedSlot = scopedSlots[name]
+
+    let children = slotReplacesChildren ? [] : context.children
 
     if (skip || (!slot && !scopedSlot)) {
-      return context.children ? compact(context.children) : []
+      if (fallbackTag) {
+        return [
+          h(
+            fallbackTag,
+            fallbackTagData,
+            flatten(Object.values(context.slots()))
+          )
+        ]
+      } else {
+        return context.children ? compact(context.children) : []
+      }
     } else if (scopedSlot) {
-      return compact([
-        scopedSlot(renderableSlotScope(context.children, context.data))
-      ])
+      return compact([scopedSlot(renderableSlotScope(children, slotScopeData))])
     } else {
       let slotsToRender = firstSlotOnly ? slot.slice(0, 1) : slot
       return compact(
@@ -54,7 +79,7 @@ export default {
           let data = omit(slot.data || {}, ['slot'])
           if (slot.tag) {
             return h(slot.tag, data, [
-              ...(context.children || []),
+              ...(children || []),
               ...(slot.children || [])
             ])
           } else {

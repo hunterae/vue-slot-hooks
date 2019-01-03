@@ -5,6 +5,8 @@
 import { pick, omit } from '../utils/HelperUtils'
 import RenderSlotHooks from './RenderSlotHooks'
 import { InheritSlots } from 'vue-inherit-slots'
+//  For local development:
+// import InheritSlots from '../../../vue-inherit-slots/src/components/InheritSlots'
 
 export default {
   props: {
@@ -26,23 +28,17 @@ export default {
     slotHookNameResolver: {
       type: Function,
       default(slotName, hookName) {
-        if (hookName === 'default') {
-          return slotName ? ['default', slotName] : 'default'
+        if (hookName === 'tag') {
+          return slotName || 'tag'
+        } else if (hookName === 'default') {
+          return 'default'
+        } else if (hookName === 'around_content') {
+          return slotName ? `around_${slotName}_content` : hookName
         } else {
           return slotName ? `${hookName}_${slotName}` : hookName
         }
       }
     }
-    // TODO: implement this
-    // replaceable: {
-    //   type: Boolean,
-    //   default: true
-    // },
-    // TODO: implement this - whether or not replacing the element definition completely replaces it or just replaces it's children
-    // preserveTag: {
-    //   type: Boolean,
-    //   default: true
-    // }
     // TODO: implement this
     // skippable: {
     //   type: Boolean,
@@ -53,18 +49,17 @@ export default {
   render(createElement, context) {
     let { inheritSlots, slotHookRenderer, tag } = context.props
     let scopedSlots = context.data.scopedSlots || {}
-    tag = tag || context.data.tag || 'div'
+    tag = tag || context.data.tag
 
     let inheritedSlots = []
     if (inheritSlots) {
       inheritedSlots = [
         createElement(InheritSlots, {
-          scopedSlots: omit(scopedSlots, ['default']),
+          scopedSlots: scopedSlots,
           props: pick(context.props, Object.keys(InheritSlots.props))
         })
       ]
     }
-
     return createElement(
       slotHookRenderer,
       {
@@ -75,7 +70,7 @@ export default {
           tag
         }
       },
-      [...inheritedSlots, context.children]
+      [...inheritedSlots, ...(context.children || [])]
     )
   }
 }

@@ -11,12 +11,17 @@ export default {
       default: false
     },
     tag: {
-      type: String,
       required: true
     },
     tagData: {
       type: Object,
       default: null
+    },
+    slotScopeData: {
+      type: Object,
+      default() {
+        return {}
+      }
     },
     passSlotsToTag: {
       type: Boolean,
@@ -25,6 +30,10 @@ export default {
     slotHookNameResolver: {
       type: Function,
       required: true
+    },
+    replaceable: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -39,13 +48,16 @@ export default {
       tag,
       innerSlotHooksOnly,
       slotHookNameResolver,
-      passSlotsToTag
+      passSlotsToTag,
+      replaceable,
+      slotScopeData
     } = context.props
 
     let slotProps = {
       ...context.props,
       slots,
-      scopedSlots: scopedSlots
+      scopedSlots,
+      slotScopeData
     }
 
     let slotHookNames = [
@@ -55,14 +67,16 @@ export default {
       'before',
       'around',
       'after',
-      'surround',
+      'around_content',
       'prepend',
       'default',
-      'append'
+      'append',
+      'tag'
     ].reduce((hash, hookName) => {
       hash[hookName] = slotHookNameResolver(slotName, hookName)
       return hash
     }, {})
+
     let slotNamesUsed = flatten(Object.values(slotHookNames))
 
     let slotChildren = passSlotsToTag
@@ -82,6 +96,16 @@ export default {
     let tagData = {
       ...(context.props.tagData || omit(context.data, ['props'])),
       scopedSlots: omit(scopedSlots, slotNamesUsed)
+    }
+
+    if (replaceable) {
+      tagData = slotDataFor('tag', {
+        firstSlotOnly: true,
+        fallbackTagData: tagData,
+        fallbackTag: tag,
+        slotReplacesChildren: true
+      })
+      tag = RenderSlot
     }
 
     let content = [
@@ -111,7 +135,7 @@ export default {
                 ...slotChildren,
                 createElement(
                   RenderSlot,
-                  slotDataFor('surround', { firstSlotOnly: true }),
+                  slotDataFor('around_content', { firstSlotOnly: true }),
                   [
                     createElement(RenderSlot, slotDataFor('prepend')),
                     createElement(RenderSlot, slotDataFor('default')),
@@ -121,22 +145,16 @@ export default {
               ])
             ]
           ),
-          createElement(RenderSlot, {
-            props: {
-              ...slotProps,
-              skip: innerSlotHooksOnly,
-              name: slotHookNameResolver(slotName, 'after')
-            }
-          })
+          createElement(
+            RenderSlot,
+            slotDataFor('after', { skip: innerSlotHooksOnly })
+          )
         ]
       ),
-      createElement(RenderSlot, {
-        props: {
-          ...slotProps,
-          skip: innerSlotHooksOnly,
-          name: slotHookNameResolver(slotName, 'after_all')
-        }
-      })
+      createElement(
+        RenderSlot,
+        slotDataFor('after_all', { skip: innerSlotHooksOnly })
+      )
     ]
 
     return innerSlotHooksOnly ? flatten(content)[0] : content
