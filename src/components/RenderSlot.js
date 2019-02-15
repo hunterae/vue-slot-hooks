@@ -77,7 +77,8 @@ export default {
       return compact(
         slotsToRender.map(slot => {
           let data = omit(slot.data || {}, ['slot'])
-          if (slot.tag) {
+
+          if (slot.tag && !slot.componentOptions) {
             return h(slot.tag, data, [
               ...(children || []),
               ...(slot.children || [])
