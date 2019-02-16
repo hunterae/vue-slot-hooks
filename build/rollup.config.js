@@ -19,6 +19,7 @@ import resolve from 'rollup-plugin-node-resolve'
 const argv = minimist(process.argv.slice(2))
 
 const config = {
+  external: ['vue-inherit-slots'],
   input: 'src/plugin.js',
   output: {
     name: 'VueSlotHooks',
