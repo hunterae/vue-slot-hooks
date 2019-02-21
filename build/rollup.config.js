@@ -23,7 +23,10 @@ const config = {
   input: 'src/plugin.js',
   output: {
     name: 'VueSlotHooks',
-    exports: 'named'
+    exports: 'named',
+    globals: {
+      'vue-inherit-slots': 'VueInheritSlots'
+    }
   },
   plugins: [
     resolve({
