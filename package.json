@@ -1,6 +1,6 @@
 {
   "name": "vue-slot-hooks",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "dist/vue-slot-hooks.umd.js",
   "module": "dist/vue-slot-hooks.esm.js",
   "unpkg": "dist/vue-slot-hooks.min.js",

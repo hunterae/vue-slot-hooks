@@ -53,12 +53,7 @@ export default {
       slotScopeData
     } = context.props
 
-    let slotProps = {
-      ...context.props,
-      slots,
-      scopedSlots,
-      slotScopeData
-    }
+    let slotProps = { ...context.props, slots, scopedSlots, slotScopeData }
 
     let slotHookNames = [
       'before_all',
@@ -108,55 +103,45 @@ export default {
       tag = RenderSlot
     }
 
-    let content = [
+    let innerContent = createElement(tag, tagData, [
+      ...slotChildren,
       createElement(
         RenderSlot,
-        slotDataFor('before_all', { skip: innerSlotHooksOnly })
-      ),
-      createElement(
-        RenderSlot,
-        slotDataFor('around_all', {
-          skip: innerSlotHooksOnly,
+        slotDataFor('around_content', {
           firstSlotOnly: true
         }),
         [
-          createElement(
-            RenderSlot,
-            slotDataFor('before', { skip: innerSlotHooksOnly })
-          ),
-          createElement(
-            RenderSlot,
-            slotDataFor('around', {
-              skip: innerSlotHooksOnly,
-              firstSlotOnly: true
-            }),
-            [
-              createElement(tag, tagData, [
-                ...slotChildren,
-                createElement(
-                  RenderSlot,
-                  slotDataFor('around_content', { firstSlotOnly: true }),
-                  [
-                    createElement(RenderSlot, slotDataFor('prepend')),
-                    createElement(RenderSlot, slotDataFor('default')),
-                    createElement(RenderSlot, slotDataFor('append'))
-                  ]
-                )
-              ])
-            ]
-          ),
-          createElement(
-            RenderSlot,
-            slotDataFor('after', { skip: innerSlotHooksOnly })
-          )
+          createElement(RenderSlot, slotDataFor('prepend')),
+          createElement(RenderSlot, slotDataFor('default')),
+          createElement(RenderSlot, slotDataFor('append'))
         ]
-      ),
-      createElement(
-        RenderSlot,
-        slotDataFor('after_all', { skip: innerSlotHooksOnly })
       )
-    ]
+    ])
 
-    return innerSlotHooksOnly ? flatten(content)[0] : content
+    if (innerSlotHooksOnly) {
+      return innerContent
+    } else {
+      return [
+        createElement(RenderSlot, slotDataFor('before_all')),
+        createElement(
+          RenderSlot,
+          slotDataFor('around_all', {
+            firstSlotOnly: true
+          }),
+          [
+            createElement(RenderSlot, slotDataFor('before', {})),
+            createElement(
+              RenderSlot,
+              slotDataFor('around', {
+                firstSlotOnly: true
+              }),
+              [innerContent]
+            ),
+            createElement(RenderSlot, slotDataFor('after'))
+          ]
+        ),
+        createElement(RenderSlot, slotDataFor('after_all'))
+      ]
+    }
   }
 }
