@@ -11,7 +11,7 @@ export default {
       default: false
     },
     tag: {
-      required: true
+      default: 'template'
     },
     tagData: {
       type: Object,
@@ -25,7 +25,7 @@ export default {
     },
     passSlotsToTag: {
       type: Boolean,
-      default: true
+      default: false
     },
     slotHookNameResolver: {
       type: Function,
@@ -56,17 +56,15 @@ export default {
     let slotProps = { ...context.props, slots, scopedSlots, slotScopeData }
 
     let slotHookNames = [
-      'before_all',
-      'around_all',
-      'after_all',
       'before',
       'around',
-      'after',
+      'tag',
+      'prepend_tag',
       'around_content',
-      'prepend',
-      'default',
-      'append',
-      'tag'
+      'prepend_content',
+      'content',
+      'append_content',
+      'append_tag'
     ].reduce((hash, hookName) => {
       hash[hookName] = slotHookNameResolver(slotName, hookName)
       return hash
@@ -74,9 +72,20 @@ export default {
 
     let slotNamesUsed = flatten(Object.values(slotHookNames))
 
-    let slotChildren = passSlotsToTag
-      ? flatten(Object.values(omit(slots, slotNamesUsed)))
-      : []
+    let slotChildren = []
+    if (passSlotsToTag) {
+      slotChildren = Object.entries(omit(slots, slotNamesUsed)).map(
+        ([slotName, slots]) => {
+          return createElement(
+            'template',
+            {
+              slot: slotName
+            },
+            slots
+          )
+        }
+      )
+    }
 
     let slotDataFor = (hookName, additionalProps = {}) => {
       return {
@@ -105,42 +114,34 @@ export default {
 
     let innerContent = createElement(tag, tagData, [
       ...slotChildren,
+      createElement(RenderSlot, slotDataFor('prepend_tag')),
       createElement(
         RenderSlot,
         slotDataFor('around_content', {
           firstSlotOnly: true
         }),
         [
-          createElement(RenderSlot, slotDataFor('prepend')),
-          createElement(RenderSlot, slotDataFor('default')),
-          createElement(RenderSlot, slotDataFor('append'))
+          createElement(RenderSlot, slotDataFor('prepend_content')),
+          createElement(RenderSlot, slotDataFor('content')),
+          createElement(RenderSlot, slotDataFor('append_content'))
         ]
-      )
+      ),
+      createElement(RenderSlot, slotDataFor('append_tag'))
     ])
 
     if (innerSlotHooksOnly) {
       return innerContent
     } else {
       return [
-        createElement(RenderSlot, slotDataFor('before_all')),
+        createElement(RenderSlot, slotDataFor('before')),
         createElement(
           RenderSlot,
-          slotDataFor('around_all', {
+          slotDataFor('around', {
             firstSlotOnly: true
           }),
-          [
-            createElement(RenderSlot, slotDataFor('before', {})),
-            createElement(
-              RenderSlot,
-              slotDataFor('around', {
-                firstSlotOnly: true
-              }),
-              [innerContent]
-            ),
-            createElement(RenderSlot, slotDataFor('after'))
-          ]
+          [innerContent]
         ),
-        createElement(RenderSlot, slotDataFor('after_all'))
+        createElement(RenderSlot, slotDataFor('after'))
       ]
     }
   }

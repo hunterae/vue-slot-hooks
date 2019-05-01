@@ -14,7 +14,7 @@ export default {
     ...InheritSlots.props,
     inheritSlots: {
       type: Boolean,
-      default: false
+      default: true
     },
     tag: {
       default: null
@@ -28,12 +28,15 @@ export default {
     slotHookNameResolver: {
       type: Function,
       default(slotName, hookName) {
+        let splitHookName = hookName.match(/(\w+)_(\w+)/)
         if (hookName === 'tag') {
           return slotName || 'tag'
-        } else if (hookName === 'default') {
-          return 'default'
-        } else if (hookName === 'around_content') {
-          return slotName ? `around_${slotName}_content` : hookName
+        } else if (hookName === 'content') {
+          return ['default', slotName ? `${slotName}_content` : 'content']
+        } else if (splitHookName) {
+          return slotName
+            ? `${splitHookName[1]}_${slotName}_${splitHookName[2]}`
+            : hookName
         } else {
           return slotName ? `${hookName}_${slotName}` : hookName
         }
@@ -52,14 +55,21 @@ export default {
     tag = tag || context.data.tag
 
     let inheritedSlots = []
-    if (inheritSlots) {
-      inheritedSlots = [
-        createElement(InheritSlots, {
+
+    inheritedSlots = [
+      createElement(
+        InheritSlots,
+        {
           scopedSlots: scopedSlots,
-          props: pick(context.props, Object.keys(InheritSlots.props))
-        })
-      ]
-    }
+          props: {
+            ...pick(context.props, Object.keys(InheritSlots.props)),
+            inheritParentSlots: inheritSlots
+          }
+        },
+        context.children
+      )
+    ]
+
     return createElement(
       slotHookRenderer,
       {
@@ -70,7 +80,7 @@ export default {
           tag
         }
       },
-      [...inheritedSlots, ...(context.children || [])]
+      inheritedSlots
     )
   }
 }

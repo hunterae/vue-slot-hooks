@@ -4,8 +4,7 @@ import { renderableSlotScope } from '../utils/RenderUtils'
 export default {
   props: {
     name: {
-      required: true,
-      type: String
+      required: true
     },
     slots: {
       type: Object,
@@ -53,8 +52,16 @@ export default {
     } = context.props
     let slot, scopedSlot
 
-    slot = slots[name]
-    scopedSlot = scopedSlots[name]
+    let slotNames = name
+    if (!Array.isArray(slotNames)) {
+      slotNames = [name]
+    }
+    slotNames.some(name => {
+      slot = slots[name]
+      scopedSlot = scopedSlots[name]
+
+      return slot || scopedSlot
+    })
 
     let children = slotReplacesChildren ? [] : context.children
 
@@ -71,19 +78,25 @@ export default {
         return context.children ? compact(context.children) : []
       }
     } else if (scopedSlot) {
-      return compact([scopedSlot(renderableSlotScope(children, slotScopeData))])
+      let content = scopedSlot(renderableSlotScope(children, slotScopeData))
+      if (content.isComment && content.text === '') {
+        return children
+      } else {
+        return compact([content])
+      }
     } else {
       let slotsToRender = firstSlotOnly ? slot.slice(0, 1) : slot
       return compact(
         slotsToRender.map(slot => {
           let data = omit(slot.data || {}, ['slot'])
-
           if (slot.tag && !slot.componentOptions) {
             return h(slot.tag, data, [
               ...(children || []),
               ...(slot.children || [])
             ])
           } else {
+            slot.data = data
+
             return slot
           }
         })

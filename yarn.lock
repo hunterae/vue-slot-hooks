@@ -6824,9 +6824,10 @@ vue-hot-reload-api@^2.3.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.1.tgz#b2d3d95402a811602380783ea4f566eb875569a2"
 
-vue-inherit-slots@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/vue-inherit-slots/-/vue-inherit-slots-0.1.1.tgz#f1e42fa880071c1d7ca2795964a6dae6255a82ff"
+vue-inherit-slots@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/vue-inherit-slots/-/vue-inherit-slots-0.2.0.tgz#ad10b51bda4d1f33bf7ad789cf55a2611b2c585c"
+  integrity sha512-6XkhmFvZHCf8J/FMmFt4XwF561ecg86bLj/qfYd74gHKFdvll/Vm6fGgwa30dkNoVqCd+niaplpmU8pmhnYEOA==
 
 vue-loader@^15.4.2:
   version "15.4.2"
