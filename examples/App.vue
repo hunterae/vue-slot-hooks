@@ -20,21 +20,17 @@
       <h4 slot="prepend_content">Prepended to content</h4>
       <h4 slot="append_content">Appended to content</h4>
       <h5 slot="some_other_slot">Some other slot from app</h5>
-      <div slot="abcd" slot-scope="something">
-        <h1>t</h1>
-      </div>
+      <div slot="abcd" slot-scope="{}"><h1>t</h1></div>
     </some-component>
   </div>
 </template>
 
 <script>
-import RenderTagWithContent from './components/RenderTagWithContent'
 import SomeComponent from './components/SomeComponent'
 
 export default {
   name: 'app',
   components: {
-    RenderTagWithContent,
     SomeComponent
   }
 }

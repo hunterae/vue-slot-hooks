@@ -3,18 +3,23 @@
 // TODO: See if importing Lodash methods via approach in this article https://www.blazemeter.com/blog/the-correct-way-to-import-lodash-libraries-a-benchmark is sufficient over the custom implemntations of these methods
 
 import { pick, omit } from '../utils/HelperUtils'
+import { mergeSlots } from '../utils/RenderUtils'
 import RenderSlotHooks from './RenderSlotHooks'
-import { InheritSlots } from 'vue-inherit-slots'
-//  For local development:
-// import InheritSlots from '../../../vue-inherit-slots/src/components/InheritSlots'
 
 export default {
   props: {
     ...omit(RenderSlotHooks.props, ['tag', 'slotHookNameResolver']),
-    ...InheritSlots.props,
-    inheritSlots: {
+    inheritDefaultSlot: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    inheritParentSlots: {
+      type: Boolean,
+      default: false
+    },
+    scopedSlots: {
+      type: Object,
+      default: null
     },
     tag: {
       default: null
@@ -50,37 +55,38 @@ export default {
   },
   functional: true,
   render(createElement, context) {
-    let { inheritSlots, slotHookRenderer, tag } = context.props
-    let scopedSlots = context.data.scopedSlots || {}
+    let {
+      slotHookRenderer,
+      tag,
+      inheritDefaultSlot,
+      inheritParentSlots
+    } = context.props
+
+    let parentScopedSlots = context.props.scopedSlots
+
+    // if (context.props.slotName === 'header_row') debugger
     tag = tag || context.data.tag
 
-    let inheritedSlots = []
+    if (!parentScopedSlots) {
+      if (inheritParentSlots) {
+        parentScopedSlots = context.parent.$scopedSlots || {}
+      } else {
+        parentScopedSlots = {}
+      }
+    }
+    if (!inheritDefaultSlot) {
+      parentScopedSlots = omit(parentScopedSlots, ['default'])
+    }
 
-    inheritedSlots = [
-      createElement(
-        InheritSlots,
-        {
-          scopedSlots: scopedSlots,
-          props: {
-            ...pick(context.props, Object.keys(InheritSlots.props)),
-            inheritParentSlots: inheritSlots
-          }
-        },
-        context.children
-      )
-    ]
+    let scopedSlots = mergeSlots(context.scopedSlots, parentScopedSlots)
 
-    return createElement(
-      slotHookRenderer,
-      {
-        ...context.data,
-        scopedSlots,
-        props: {
-          ...pick(context.props, Object.keys(RenderSlotHooks.props)),
-          tag
-        }
-      },
-      inheritedSlots
-    )
+    return createElement(slotHookRenderer, {
+      ...context.data,
+      scopedSlots,
+      props: {
+        ...pick(context.props, Object.keys(RenderSlotHooks.props)),
+        tag
+      }
+    })
   }
 }

@@ -23,10 +23,6 @@ export default {
         return {}
       }
     },
-    passSlotsToTag: {
-      type: Boolean,
-      default: false
-    },
     slotHookNameResolver: {
       type: Function,
       required: true
@@ -41,22 +37,21 @@ export default {
   },
   functional: true,
   render(createElement, context) {
-    let slots = context.slots()
-    let scopedSlots = context.data.scopedSlots
+    let scopedSlots = context.scopedSlots || {}
     let {
       slotName,
       tag,
       innerSlotHooksOnly,
       slotHookNameResolver,
-      passSlotsToTag,
       replaceable,
       slotScopeData
     } = context.props
 
-    let slotProps = { ...context.props, slots, scopedSlots, slotScopeData }
+    let slotProps = { ...context.props, scopedSlots, slotScopeData }
 
     let slotHookNames = [
       'before',
+      'after',
       'around',
       'tag',
       'prepend_tag',
@@ -71,21 +66,6 @@ export default {
     }, {})
 
     let slotNamesUsed = flatten(Object.values(slotHookNames))
-
-    let slotChildren = []
-    if (passSlotsToTag) {
-      slotChildren = Object.entries(omit(slots, slotNamesUsed)).map(
-        ([slotName, slots]) => {
-          return createElement(
-            'template',
-            {
-              slot: slotName
-            },
-            slots
-          )
-        }
-      )
-    }
 
     let slotDataFor = (hookName, additionalProps = {}) => {
       return {
@@ -106,14 +86,13 @@ export default {
       tagData = slotDataFor('tag', {
         firstSlotOnly: true,
         fallbackTagData: tagData,
-        fallbackTag: tag,
-        slotReplacesChildren: true
+        fallbackTag: tag
+        // slotReplacesChildren: true
       })
       tag = RenderSlot
     }
 
     let innerContent = createElement(tag, tagData, [
-      ...slotChildren,
       createElement(RenderSlot, slotDataFor('prepend_tag')),
       createElement(
         RenderSlot,

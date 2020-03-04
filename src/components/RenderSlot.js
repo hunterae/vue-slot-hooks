@@ -1,13 +1,9 @@
-import { omit, compact, flatten } from '../utils/HelperUtils'
+import { omit, compact } from '../utils/HelperUtils'
 import { renderableSlotScope } from '../utils/RenderUtils'
 
 export default {
   props: {
     name: {
-      required: true
-    },
-    slots: {
-      type: Object,
       required: true
     },
     scopedSlots: {
@@ -41,7 +37,6 @@ export default {
   render(h, context) {
     let {
       name,
-      slots,
       scopedSlots,
       skip,
       firstSlotOnly,
@@ -56,34 +51,28 @@ export default {
     if (!Array.isArray(slotNames)) {
       slotNames = [name]
     }
+
     slotNames.some(name => {
-      slot = slots[name]
       scopedSlot = scopedSlots[name]
 
-      return slot || scopedSlot
+      return scopedSlot
     })
 
     let children = slotReplacesChildren ? [] : context.children
 
     if (skip || (!slot && !scopedSlot)) {
       if (fallbackTag) {
-        return [
-          h(
-            fallbackTag,
-            fallbackTagData,
-            flatten(Object.values(context.slots()))
-          )
-        ]
+        return [h(fallbackTag, fallbackTagData, context.children)]
       } else {
         return context.children ? compact(context.children) : []
       }
     } else if (scopedSlot) {
       let content = scopedSlot(renderableSlotScope(children, slotScopeData))
-      if (content.isComment && content.text === '') {
-        return children
-      } else {
-        return compact([content])
-      }
+      content = compact(content)
+      content.forEach(node => {
+        if (node.data && node.data.slot) delete node.data.slot
+      })
+      return content
     } else {
       let slotsToRender = firstSlotOnly ? slot.slice(0, 1) : slot
       return compact(

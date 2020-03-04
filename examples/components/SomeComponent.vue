@@ -9,13 +9,16 @@
       </div>
     </h1> -->
 
-    <render-with-slot-hooks tag="functional-render-tag-with-content" content-tag="h1" slot-name="navbar" inherit-slots>
+    <render-with-slot-hooks
+      tag="functional-render-tag-with-content"
+      content-tag="h1"
+      slot-name="navbar"
+      :scoped-slots="$scopedSlots"
+    >
       <h5 slot="some_other_slot">Some other slot from SomeComponent</h5>
       <h2 slot="prepend_navbar">Prepended in component</h2>
       my header
-      <div slot="efgh" slot-scope="something">
-        <h1>t</h1>
-      </div>
+      <div slot="efgh" slot-scope="{}"><h1>t</h1></div>
     </render-with-slot-hooks>
     <!-- <render-tag-with-content content-tag="h1">
       <inherit-slots />
@@ -40,8 +43,7 @@
     <!-- <render-with-slot-hooks tag="div" slot-name="content" inherit-parent-slots>
       Content
     </render-with-slot-hooks> -->
-   
-  </div>  
+  </div>
 </template>
 
 <script>
@@ -56,5 +58,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

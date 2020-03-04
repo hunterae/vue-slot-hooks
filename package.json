@@ -1,6 +1,6 @@
 {
   "name": "vue-slot-hooks",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "dist/vue-slot-hooks.umd.js",
   "module": "dist/vue-slot-hooks.esm.js",
   "unpkg": "dist/vue-slot-hooks.min.js",
@@ -45,7 +45,7 @@
     "vue-template-compiler": "^2.5.17"
   },
   "peerDependencies": {
-    "vue": ">=2.1.0"
+    "vue": ">=2.6.0"
   },
   "browserslist": [
     "> 1%",
@@ -53,6 +53,5 @@
     "not ie <= 8"
   ],
   "dependencies": {
-    "vue-inherit-slots": "^0.2.0"
   }
 }
